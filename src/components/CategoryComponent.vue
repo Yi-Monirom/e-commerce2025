@@ -83,8 +83,8 @@ const item_category: CategoryItem[] = [
 .category_btt {
   padding         : 5px;
   min-width       : 100px;
-  width           : 100px;
-  height          : 130px;
+  width           : 136px;
+  height          : 177px;
   margin          : 10px;
   display         : flex;
   flex-direction  : column;
@@ -115,6 +115,5 @@ const item_category: CategoryItem[] = [
   font-size : 10px;
   color     : lightslategray;
 }
-
 
 </style>

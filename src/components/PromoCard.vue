@@ -1,4 +1,7 @@
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+
 class PosterItem {
   img: string
   label: string
@@ -6,7 +9,13 @@ class PosterItem {
   btt_color: string
   bg_color: string
 
-  constructor(img: string, label: string, btt_label: string, btt_color: string, bg_color: string) {
+  constructor(
+    img: string,
+    label: string,
+    btt_label: string,
+    btt_color: string,
+    bg_color: string
+  ) {
     this.img = img
     this.label = label
     this.btt_label = btt_label
@@ -15,23 +24,61 @@ class PosterItem {
   }
 }
 
-const item_poster: PosterItem[] = [
-  new PosterItem("image/Cms-1.png", "Everyday Fresh & Clean with Our Products", "Shop Now", "green", "#F0E8D5"),
-  new PosterItem("image/Cms-2.png", "Make your Breakfast Healthy and Easy", "Shop Now", "green", "#F3E8E8"),
-  new PosterItem("image/Cms-3.png", "Discover the Best Deals on Groceries", "Shop Now", "#FDC040", "#E7EAF3"),
-]
 
+export default defineComponent({
+  name: 'PosterList',
+
+  data() {
+    return {
+      item_poster: [
+        new PosterItem(
+          'image/Cms-1.png',
+          'Everyday Fresh & Clean with Our Products',
+          'Shop Now',
+          'green',
+          '#F0E8D5'
+        ),
+        new PosterItem(
+          'image/Cms-2.png',
+          'Make your Breakfast Healthy and Easy',
+          'Shop Now',
+          'green',
+          '#F3E8E8'
+        ),
+        new PosterItem(
+          'image/Cms-3.png',
+          'Discover the Best Deals on Groceries',
+          'Shop Now',
+          '#FDC040',
+          '#E7EAF3'
+        )
+      ] as PosterItem[]
+    }
+  },
+
+  methods: {
+    shopnow(item: PosterItem) {
+      alert(`Shop Now: ${item.label}`)
+    }
+  }
+})
 </script>
 
 <template>
   <div class="poster_list" role="list">
-    <div v-for="item in item_poster" :key="item.label" class="poster_item" role="listitem">
+    <div
+      v-for="item in item_poster"
+      :key="item.label"
+      class="poster_item"
+      role="listitem"
+    >
       <div class="poster_main" :style="{ backgroundColor: item.bg_color }">
         <div class="poster_content">
           <span class="poster_label">{{ item.label }}</span>
           <button
             class="poster_btt"
             :style="{ backgroundColor: item.btt_color }"
+            @click="shopnow(item)"
           >
             {{ item.btt_label }}
           </button>
@@ -55,8 +102,8 @@ const item_poster: PosterItem[] = [
 
 .poster_main {
   position: relative;
-  width: 520px;
-  height: 260px;
+  width: 512px;
+  height: 300px;
   border-radius: 12px;
   padding: 40px;
   display: flex;
@@ -74,7 +121,7 @@ const item_poster: PosterItem[] = [
 
 .poster_label {
   font-size: 18px;
-  font-family: "Quicksand", sans-serif;
+  font-family: 'Quicksand', sans-serif;
   font-weight: bold;
   color: #181818;
   max-width: 250px;
