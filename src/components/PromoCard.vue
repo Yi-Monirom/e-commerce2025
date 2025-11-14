@@ -1,28 +1,30 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-
+import axios from 'axios'
 
 class PosterItem {
-  img: string
-  label: string
-  btt_label: string
-  btt_color: string
-  bg_color: string
+  title: string
+  buttonColor: string
+  color: string
+  url: string
+  imag: string
 
   constructor(
-    img: string,
-    label: string,
-    btt_label: string,
-    btt_color: string,
-    bg_color: string
-  ) {
-    this.img = img
-    this.label = label
-    this.btt_label = btt_label
-    this.btt_color = btt_color
-    this.bg_color = bg_color
+      title: string,
+      buttonColor: string,
+      color: string,
+      url: string,
+      imag: string
+  ) 
+  {
+    this.title = title
+    this.buttonColor = buttonColor
+    this.color = color
+    this.url = url
+    this.imag = imag
   }
 }
+
 
 
 export default defineComponent({
@@ -38,53 +40,81 @@ export default defineComponent({
           'green',
           '#F0E8D5'
         ),
-        new PosterItem(
-          'image/Cms-2.png',
-          'Make your Breakfast Healthy and Easy',
-          'Shop Now',
-          'green',
-          '#F3E8E8'
-        ),
-        new PosterItem(
-          'image/Cms-3.png',
-          'Discover the Best Deals on Groceries',
-          'Shop Now',
-          '#FDC040',
-          '#E7EAF3'
-        )
-      ] as PosterItem[]
+        // new PosterItem(
+        //   'image/Cms-2.png',
+        //   'Make your Breakfast Healthy and Easy',
+        //   'Shop Now',
+        //   'green',
+        //   '#F3E8E8'
+        // ),
+        // new PosterItem(
+        //   'image/Cms-3.png',
+        //   'Discover the Best Deals on Groceries',
+        //   'Shop Now',
+        //   '#FDC040',
+        //   '#E7EAF3'
+        // )
+       ] as PosterItem[]
     }
   },
 
   methods: {
     shopnow(item: PosterItem) {
-      alert(`Shop Now: ${item.label}`)
+      alert(`Shop Now: ${item.title}`)
+    },
+    fetchPromotions(){
+      axios.get('http://localhost:3000/api/promotions')
+        .then(response => {
+          if (Array.isArray(response.data) && response.data.length > 0) {
+            this.item_poster = response.data.map((promo: any) =>
+            new PosterItem(
+              promo.title,
+              promo.buttonColor,
+              promo.color,
+              '#', // use real shop link if available
+              promo.image.replace(/\\/g, '/') // replace backslashes for Vue
+            )
+          );
+
+            console.log('Mapped promotions:', this.item_poster);
+          } else {
+            console.warn('API returned no promotions');
+          }
+          console.log(this.item_poster);
+        })
+        .catch(error => {
+          console.error('API Error:', error);
+        });
     }
+  },
+  mounted() {
+    this.fetchPromotions();
   }
 })
 </script>
 
 <template>
+  
   <div class="poster_list" role="list">
     <div
       v-for="item in item_poster"
-      :key="item.label"
+      :key="item.title"
       class="poster_item"
       role="listitem"
     >
-      <div class="poster_main" :style="{ backgroundColor: item.bg_color }">
+      <div class="poster_main" :style="{ backgroundColor: item.color }">
         <div class="poster_content">
-          <span class="poster_label">{{ item.label }}</span>
+          <span class="poster_label">{{ item.title }}</span>
           <button
             class="poster_btt"
-            :style="{ backgroundColor: item.btt_color }"
+            :style="{ backgroundColor: item.buttonColor }"
             @click="shopnow(item)"
           >
-            {{ item.btt_label }}
+            {{ "Shop Now" }}
           </button>
         </div>
 
-        <img class="poster_img" :src="item.img" alt="Poster image" />
+        <img class="poster_img" :src="item.imag" alt="Poster image" />
       </div>
     </div>
   </div>
@@ -120,7 +150,7 @@ export default defineComponent({
 }
 
 .poster_label {
-  font-size: 18px;
+  font-size: 20px;
   font-family: 'Quicksand', sans-serif;
   font-weight: bold;
   color: #181818;
