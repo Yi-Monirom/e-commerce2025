@@ -77,7 +77,7 @@ onMounted(async () => {
       class="category_btt"
       :style="{ '--bg': item.color, '--hover': item.hover_color }"
     >
-      <img class="category_img" :src="item.img" alt="Category image">
+      <img class="category_img" :src="`http://localhost:3000/${item.img}`" alt="Category image">
       <span class="category_name">{{ item.name }}</span>
       <span class="category_count">{{ item.count }} {{ item.prefix }}</span>
     </button>

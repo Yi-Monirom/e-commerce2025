@@ -33,13 +33,13 @@ export default defineComponent({
   data() {
     return {
       item_poster: [
-        new PosterItem(
-          'image/Cms-1.png',
-          'Everyday Fresh & Clean with Our Products',
-          'Shop Now',
-          'green',
-          '#F0E8D5'
-        ),
+        // new PosterItem(
+        //   'image/Cms-1.png',
+        //   'Everyday Fresh & Clean with Our Products',
+        //   'Shop Now',
+        //   'green',
+        //   '#F0E8D5'
+        // ),
         // new PosterItem(
         //   'image/Cms-2.png',
         //   'Make your Breakfast Healthy and Easy',
@@ -114,7 +114,7 @@ export default defineComponent({
           </button>
         </div>
 
-        <img class="poster_img" :src="item.imag" alt="Poster image" />
+        <img class="poster_img" :src="`http://localhost:3000/${item.imag}`" alt="Poster image" />
       </div>
     </div>
   </div>
