@@ -1,38 +1,67 @@
-<script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-
-const CategoryComponent = defineAsyncComponent(() => import('./components/CategoryComponent.vue'))
-const PromoCard = defineAsyncComponent(() => import('./components/PromoCard.vue'))
-
-
-</script>
-
 <template>
-  <div class="page-container">
-    <div class="center-content" style="transform: scale(0.8);">
-      <CategoryComponent />
-      <PromoCard />
-    </div>
+  <div class="home">
+
+    <CategoryListLocal :categories="categories" />
+    <PromotionListLocal :promotions="promotions" />
+
   </div>
 </template>
 
+<script>
+import axios from "axios";
+
+import CategoryList from "./components/CategoryComponent.vue";
+import PromotionList from "./components/PromoCard.vue";
+
+export default {
+  name: "Home",
+
+  components: {
+    CategoryListLocal: CategoryList,
+    PromotionListLocal: PromotionList,
+  },
+
+  data() {
+    return {
+      categories: [], 
+      promotions: []  
+    };
+  },
+
+  methods: {
+    async fetchCategories() {
+      try {
+        const res = await axios.get("http://localhost:3000/api/categories");
+        this.categories = res.data;   
+        console.log("Loaded categories:", this.categories);
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      }
+    },
+
+    async fetchPromotions() {
+      try {
+        const res = await axios.get("http://localhost:3000/api/promotions");
+        this.promotions = res.data;
+        console.log("Loaded promotions:", this.promotions);
+      } catch (err) {
+        console.error("Error loading promotions:", err);
+      }
+    },
+  },
+
+  mounted() {
+   
+    this.fetchCategories();
+    this.fetchPromotions();
+  }
+};
+</script>
+
 <style scoped>
-
-.page-container {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;  
-  align-items: center;     
+.home {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px;
 }
-
-
-.center-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px; 
-}
-
-
 </style>
