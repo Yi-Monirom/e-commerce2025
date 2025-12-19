@@ -19,8 +19,14 @@ export default {
         v-for="(cat, index) in categories"
         :key="index"
         :style="{ backgroundColor: cat.color }"
-      >
-        <img :src="`http://localhost:3000/${cat.image}`" :alt="cat.name" />
+        
+        
+      >  
+        <router-link :to="`/productdetail/${cat.id}`">
+          <img :src="`http://localhost:3000/${cat.image}`" :alt="cat.name" />
+        </router-link>
+                
+        
         <h4 class="text-black ">{{ cat.name }}</h4>
         <p>{{ cat.productCount }} items</p>
       </div>

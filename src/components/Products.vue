@@ -1,12 +1,19 @@
 <template>
-    <div class="min-h-screen p-6">
-            <div class="max-w-7xl mx-auto">
+    <div class="min-h-screen py-10 w-full ">
+            <div class="max-w-10xl mx-auto">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                     <!-- Product Card -->
                     <div v-for="product in products" :key="product.id" 
                          class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow duration-200 relative group">
                         
-                        <!-- Badge -->                        <div v-if="product.badge" 
+                        <!-- Promotion Badge -->
+                        <div v-if="product.promotionAsPercentage !== undefined && product.promotionAsPercentage !== null && product.promotionAsPercentage !== ''"
+                             :class="[promotionBadge(product).color, promotionBadge(product).textColor, 'absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-md z-10']">
+                            {{ promotionBadge(product).text }}
+                        </div>
+
+                        <!-- Fallback Badge -->
+                        <div v-else-if="product.badge" 
                              :class="[product.badge.color, 'absolute top-3 left-3 text-white text-xs font-semibold px-2 py-1 rounded-md z-10']">
                             {{ product.badge.text }}
                         </div>
@@ -51,10 +58,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="text-lg font-bold text-gray-900">
-                                    ${{ product.price?.toFixed(2) ?? '0.00' }}
+                                    ${{ priceAfterPromotion(product) !== null ? priceAfterPromotion(product).toFixed(2) : (product.price?.toFixed(2) ?? '0.00') }}
                                 </span>
-                                <span class="text-sm text-gray-400 line-through">
-                                    ${{ product.originalPrice?.toFixed(2) ?? '0.00' }}
+                                <span v-if="priceAfterPromotion(product) !== null && priceAfterPromotion(product) < (Number(product.price) || 0)" class="text-sm text-gray-400 line-through">
+                                    ${{ product.price?.toFixed(2) ?? '0.00' }}
                                 </span>
                             </div>
 
@@ -126,6 +133,74 @@ export default {
         addToCart(productId) {
             alert(`Product ${productId} added to cart!`);
         },
+        priceAfterPromotion(product) {
+            const price = Number(product?.price) || 0;
+            if (!product) return price;
+
+            // If product has an explicit numeric discount field, prefer it
+            if (product.discount !== undefined && !isNaN(parseFloat(product.discount))) {
+                const d = parseFloat(product.discount);
+                return Math.max(0, price - (price * d / 100));
+            }
+
+            const p = product.promotionAsPercentage;
+            if (p === null || p === undefined || p === '') return price;
+
+            // If promotion is numeric (number or numeric string), treat as percentage
+            if (typeof p === 'number' || (!isNaN(parseFloat(p)) && isFinite(p))) {
+                const percent = parseFloat(p);
+                return Math.max(0, price - (price * percent / 100));
+            }
+
+            // Handle known keyword promotions
+            const key = String(p).toLowerCase();
+            const mapping = { hot: 30, sale: 10 };
+            if (mapping[key] !== undefined) {
+                const percent = mapping[key];
+                return Math.max(0, price - (price * percent / 100));
+            }
+
+            // Unknown promotion type → return base price
+            return price;
+        }
+        ,
+        promotionBadge(product) {
+            const p = product?.promotionAsPercentage;
+            // Default
+            const result = { text: '', color: 'bg-gray-500', textColor: 'text-white' };
+            if (p === null || p === undefined || p === '') return result;
+
+            // Numeric percentage (number or numeric string)
+            if (typeof p === 'number' || (!isNaN(parseFloat(p)) && isFinite(p))) {
+                let percent = parseFloat(p);
+                if (percent > 0 && percent <= 1) percent = percent * 100;
+                const rounded = Math.round(percent * 10) / 10;
+                result.text = `${rounded}% OFF`;
+                result.color = 'bg-emerald-600';
+                result.textColor = 'text-white';
+                return result;
+            }
+
+            const key = String(p).toLowerCase();
+            if (key === 'hot') {
+                result.text = 'HOT';
+                result.color = 'bg-red-500';
+                result.textColor = 'text-white';
+                return result;
+            }
+            if (key === 'sale') {
+                result.text = 'SALE';
+                result.color = 'bg-yellow-300';
+                result.textColor = 'text-black';
+                return result;
+            }
+
+            // Unknown string → show as-is with green
+            result.text = String(p).toUpperCase();
+            result.color = 'bg-emerald-600';
+            result.textColor = 'text-white';
+            return result;
+        }
     },
 };
 </script>

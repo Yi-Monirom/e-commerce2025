@@ -1,9 +1,12 @@
 <template>
   <div class="homeView w-full min-h-screen bg-gray-100 text-black">
-    <div class="w-full px-6">
-
+    <div class="w-full px-6  ">
+      
+      <Menu />
+  
+      <ShowCase />
       <!-- Header using store data -->
-      <Header :groups="store.groups" />
+      <Header :groups="store.groups" style="padding-top: 30px ;"  />
 
       <!-- Category List -->
       <CategoryList :categories="store.categories" style="padding-top: 30px;" />
@@ -22,6 +25,7 @@
 </template>
 
 <script setup>
+
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
@@ -30,12 +34,16 @@ import PromotionList from "../components/PromoCard.vue";
 import Products from "../components/Products.vue";
 import Header from "../components/Header.vue";
 
+import ShowCase from "../components/ShowCase.vue";
+import Menu from "../components/MenuCompoent.vue";
+
+
 import { useProductStore } from "@/Store/Products";
 
 const store = useProductStore();
 
-
 const promotions = ref([]);
+name: "HomeView";
 
 async function fetchPromotions() {
   try {
