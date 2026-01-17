@@ -57,4 +57,13 @@ class User extends Authenticatable
                 $q->where('name', $permission);
             })->exists();
     }
+    public function author(){
+        return $this->hasOne(Author::class);
+    }
+    public function audience(){
+        return $this->hasOne(Audience::class);
+    }
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
 }
