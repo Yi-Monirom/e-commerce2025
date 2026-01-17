@@ -40,7 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+         // set API guard to passport
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+            'hash' => false,
+        ],
     ],
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -111,5 +118,8 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+
+   
 
 ];

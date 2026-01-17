@@ -36,5 +36,19 @@ Route::controller(ProductController::class)
         Route::delete('/{id}', 'destroy');
     });
 
+Route::post('/login', function (Request $request) {
+    $request->validate(['email'=>'required|email','password'=>'required']);
 
+    if (!Auth::attempt($request->only('email','password'))) {
+        return response()->json(['message'=>'Invalid credentials'], 401);
+    }
+
+    $user = $request->user();
+    $token = $user->createToken('mobile')->accessToken;
+
+    return response()->json(['token'=>$token]);
+});
+Route::middleware('auth:api')->group(function () {
+    Route::get('/me', fn(Request $r) => $r->user()->load('roles'));
+});
 
