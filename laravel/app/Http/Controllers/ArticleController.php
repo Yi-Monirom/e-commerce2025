@@ -10,7 +10,7 @@ class ArticleController extends Controller
         return Article::creat([
             'author_id'=>$request->author_id,
             'title'=>$request->title
-        ])
+        ]);
     }
     public function audiences(Article $article){
         return $article->audiences;

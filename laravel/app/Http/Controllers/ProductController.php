@@ -1,72 +1,94 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class ProductController extends Controller
 {
-    // Get a fresh copy of a product
+    // 1️⃣ Get a fresh copy of a product (doesn't modify original instance)
     public function freshExample($id)
     {
-        $product = Product::find($id);
+        $product = Product::findOrFail($id);
         $freshProduct = $product->fresh(); // original $product unchanged
-        return $freshProduct;
+        return response()->json($freshProduct);
     }
 
-    // Refresh the current product instance
+    // 2️⃣ Refresh the current product instance (updates instance from DB)
     public function refreshExample($id)
     {
-        $product = Product::find($id);
-        $product->refresh(); // $product is now updated from DB
-        return $product;
+        $product = Product::findOrFail($id);
+
+        // You can manually modify before refresh to see difference
+        // $product->name = "Temp Name";
+
+        $product->refresh(); // now $product is synced with DB
+        return response()->json($product);
     }
 
-    // Retrieve first active product
+    // 3️⃣ Retrieve first active product
     public function firstActive()
     {
-        return Product::where('active', 1)->first();
+        $product = Product::where('active', 1)->first();
+        return response()->json($product);
     }
 
-    // Create or update
+    // 4️⃣ Create or update product
     public function updateOrCreateExample(Request $request)
     {
         $product = Product::updateOrCreate(
             ['name' => $request->name, 'category_id' => $request->category_id],
-            ['price' => $request->price, 'discounted' => $request->discounted]
+            ['price' => $request->price ?? 0, 'discounted' => $request->discounted ?? 0]
         );
 
-        return $product;
+        return response()->json($product);
     }
 
-    // Chunk example for processing large datasets
+    // 5️⃣ Process large products safely using chunk
     public function processLargeProducts()
     {
         Product::chunk(200, function (Collection $products) {
+
             foreach ($products as $product) {
-                $product=findOrfail(1)
-                $product = Product::firstOrCreate(['name' => 'Book']);
-                $product = Product::firstOrNew(['name' => 'London to Paris']);
-                $count = Product::where('active', 1)->count();
-                $max = Product::where('active', 1)->max('price');
-                $product = new Product;
 
-                $product->name = $request->name;
-
+                // Example: update product name safely
+                $product->name = $product->name . ' (processed)';
                 $product->save();
-                $product = Product::create(['name' => 'Book']);
-                $product = Product::find(1);  
 
-                $product->name = 'Pen';
+                // Example: firstOrCreate
+                $book = Product::firstOrCreate(['name' => 'Book']);
 
-                $product->save();
-                $product = Product::updateOrCreate(['name' => 'Book', 'category_id' => 2],['price' => 99, 'discounted' => 1]);
-                $product = Product::find(1);
+                // Example: firstOrNew
+                $londonToParis = Product::firstOrNew(['name' => 'London to Paris']);
+                $londonToParis->price = $londonToParis->price ?? 50;
+                $londonToParis->save();
 
-                $product->delete();
-                Product::truncate();
-                
+                // Count active products
+                $activeCount = Product::where('active', 1)->count();
+
+                // Max price
+                $maxPrice = Product::where('active', 1)->max('price');
             }
         });
+
+        return response()->json(['message' => 'Processed large products successfully']);
+    }
+
+    // 6️⃣ Delete a product safely
+    public function deleteProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json(['message' => "Product {$id} deleted"]);
+    }
+
+    // 7️⃣ Get all products (simple list)
+    public function index()
+    {
+        $products = Product::all();
+        return response()->json($products);
     }
 }
